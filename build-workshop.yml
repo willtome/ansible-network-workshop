@@ -1,0 +1,67 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - workshop-vars.yml
+
+  tasks:
+    - include_role:
+        name: cloud-networks
+      vars:
+        - cloud_vpc_name: "{{ vpc_item }}"
+        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
+        - cloud_network_data: "{{ vpcs[vpc_item].networks }}"
+      with_items: "{{ vpcs.keys() | default([]) }}"
+      loop_control:
+        loop_var: vpc_item
+      tags:
+        - cloud
+
+    - include_role:
+        name: cloud-keypairs
+      vars:
+        - cloud_vpc_name: "{{ vpc_item }}"
+        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
+        - cloud_keypair_data: "{{ ssh_keys }}"
+      with_items: "{{ vpcs.keys() | default([]) }}"
+      loop_control:
+        loop_var: vpc_item
+      tags:
+        - cloud
+
+    - include_role:
+        name: cloud-security-groups
+      vars:
+        - cloud_vpc_name: "{{ vpc_item }}"
+        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
+        - cloud_security_group_data: "{{ acl_dict }}"
+      with_items: "{{ vpcs.keys() | default([]) }}"
+      loop_control:
+        loop_var: vpc_item
+      tags:
+        - security_groups
+
+    - include_role:
+        name: cloud-instances
+      vars:
+        - cloud_vpc_name: "{{ vpc_item }}"
+        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
+        - cloud_instance_data: "{{ vpcs[vpc_item].instances }}"
+      with_items: "{{ vpcs.keys() | default([]) }}"
+      loop_control:
+        loop_var: vpc_item
+      tags:
+        - cloud-instances
+
+    - include_role:
+        name: cloud-vnfs
+      vars:
+        - cloud_vpc_name: "{{ vpc_item }}"
+        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
+        - cloud_network_data: "{{ vpcs[vpc_item].networks }}"
+      with_items: "{{ vpcs.keys() | default([]) }}"
+      loop_control:
+        loop_var: vpc_item
+      tags:
+        - cloud-vnfs

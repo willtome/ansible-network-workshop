@@ -1,0 +1,41 @@
+---
+vpcs:
+  workshop1-1:
+    provider: aws
+    region: us-east-2
+    project: workshop1
+    cidr: 172.17.0.0/16
+    acl_list:
+      - login-acl
+      - csr-acl
+    networks:
+      - { name: student1-net1-outside, cidr: 172.17.1.0/24, az: us-east-2a }
+      - { name: student1-net1-inside, cidr: 172.17.2.0/24, az: us-east-2a, vnf_instance: student1-rtr1, inside_ip: 172.17.2.254 }
+    instances:
+      - { name: student1-tower, size: t2.micro, image: ami-0932686c, acl: login-acl, subnet: student1-net1-outside, public_ip: true, key_name: scarter, tags: {Owner: scarter, type: tower} }
+      - { name: student1-host1, size: t2.micro, image: ami-0932686c, acl: login-acl, subnet: student1-net1-inside, public_ip: false, key_name: scarter, tags: {Owner: scarter, type: host} }
+      - { name: student1-rtr1, size: t2.medium, image: ami-541e3931, acl: csr-acl, subnet: student1-net1-outside, public_ip: true, key_name: scarter, tags: {Owner: scarter, network_os: ios, type: network}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
+  workshop1-2:
+    provider: aws
+    region: us-east-2
+    project: workshop1
+    cidr: 172.18.0.0/16
+    acl_list:
+      - login-acl
+      - csr-acl
+    networks:
+      - { name: student1-net2-outside, cidr: 172.18.1.0/24, az: us-east-2b }
+      - { name: student1-net2-inside, cidr: 172.18.2.0/24, az: us-east-2b, vnf_instance: student1-rtr2, inside_ip: 172.18.2.254 }
+    instances:
+      - { name: student1-host2, size: t2.micro, image: ami-0932686c, acl: login-acl, subnet: student1-net2-inside, public_ip: false, key_name: scarter, tags: {Owner: scarter, type: host} }
+      - { name: student1-rtr2, size: t2.medium, image: ami-541e3931, acl: csr-acl, subnet: student1-net2-outside, public_ip: true, key_name: scarter, tags: {Owner: scarter, network_os: ios, type: network}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
+acl_dict:
+  login-acl:
+    - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
+    - { src_ip: 0.0.0.0/0, dst_ports: -1, proto: icmp }
+  csr-acl:
+    - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: udp }
+    - { src_ip: 0.0.0.0/0, dst_ports: 500, proto: udp }
+    - { src_ip: 0.0.0.0/0, dst_ports: 4500, proto: udp }
+ssh_keys:
+  scarter: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDK19uD+miGdkNhTdY5MA8Yw1MT//jiOWHFUECMoyl2MygTFC/MvNDXitUR4tevwjwpcMFdQnG0l6yVAg0u44L3HftErViJILRjPg24JiBefXfCEBZTqmINYnBvgkh8uvcwzauGiQ4EeTBmzN19+S+2yhJSXfGBYt5XQJ+h7sxN7MEeVRT3CoXxWyCYKjTt7CWdUHjVU/xDeGbFxJjmAO9PTWy1+iJqSQ0OID75kfddoJUOEZFX9MoFmWGwGSj4ljb64AG5WKZvBKyrRFN3MWIZgmNY+POyuKPeNctwXdlbyDk0CGTuK3gjsH2dxDES/tXiFIpXagOeNjWN4bb49Ft5 stevenca@STEVENCA-M-202D"
