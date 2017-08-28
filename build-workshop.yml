@@ -1,67 +1,63 @@
 ---
-- hosts: localhost
+- hosts: cloud
   connection: local
   gather_facts: no
-  vars_files:
-    - workshop-vars.yml
 
   tasks:
-    - include_role:
-        name: cloud-networks
-      vars:
-        - cloud_vpc_name: "{{ vpc_item }}"
-        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
-        - cloud_network_data: "{{ vpcs[vpc_item].networks }}"
-      with_items: "{{ vpcs.keys() | default([]) }}"
-      loop_control:
-        loop_var: vpc_item
-      tags:
-        - cloud
+    - name: Generate SSH keys
+      shell: ssh-keygen -b 2048 -t rsa -f "{{ workshop_name }}_key" -I "{{ workshop_name }}" -q -N ""
+      args:
+        creates: "./{{ workshop_name }}_key"
 
-    - include_role:
-        name: cloud-keypairs
+    - include_tasks: build-student.yml
       vars:
-        - cloud_vpc_name: "{{ vpc_item }}"
-        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
-        - cloud_keypair_data: "{{ ssh_keys }}"
-      with_items: "{{ vpcs.keys() | default([]) }}"
+        ansible_ssh_private_key_file: "./{{ workshop_name }}_key"
+        cloud_user: ec2-user
+        student_name: "student{{ student_number }}"
+        inside_octet: "{{ student_number | int * 2 }}"
+        outside_octet: "{{ inside_octet | int - 1 }}"
+        acl_dict:
+          host-acl:
+            - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
+            - { src_ip: 0.0.0.0/0, dst_ports: -1, proto: icmp }
+          rtr-acl:
+            - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
+            - { src_ip: 0.0.0.0/0, dst_ports: -1, proto: icmp }
+#            - { src_ip: 0.0.0.0/0, proto: all }
+        ssh_keys: "{ '{{ workshop_name }}': '{{ lookup('file', './{{ workshop_name }}_key.pub') }}' }"
+        vpc_list:
+          - name: "{{ workshop_name }}-vpc1"
+            provider: aws
+            region: us-east-2
+            project: "{{ workshop_name }}"
+            cidr: 172.17.0.0/16
+            acl_list:
+              - host-acl
+              - rtr-acl
+            networks:
+              - { name: "{{ student_name }}-net1", cidr: "172.17.{{ outside_octet }}.0/24", az: us-east-2a }
+            instances:
+              - { name: "{{ student_name }}-host1", size: t2.micro, image: ami-0932686c, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: student, group: towers} }
+              - { name: "{{ student_name }}-rtr1", size: t2.medium, image: ami-541e3931, acl: rtr-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: student, network_os: ios, group: routers}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
+            routes:
+              - { subnet: "{{ student_name }}-net1", cidr: "172.18.{{ inside_octet }}.0/24", instance: "{{ student_name }}-rtr1" }
+          - name: "{{ workshop_name }}-vpc2"
+            provider: aws
+            region: us-east-2
+            project: "{{ workshop_name }}"
+            cidr: 172.18.0.0/16
+            acl_list:
+              - host-acl
+              - rtr-acl
+            networks:
+              - { name: "{{ student_name }}-net2-outside", cidr: "172.18.{{ outside_octet }}.0/24", az: us-east-2b }
+              - { name: "{{ student_name }}-net2-inside", cidr: "172.18.{{ inside_octet }}.0/24", az: us-east-2b, vnf_instance: "{{ student_name }}-rtr2", inside_ip: "172.18.{{ inside_octet }}.254" }
+            instances:
+              - { name: "{{ student_name }}-host2", size: t2.micro, image: ami-0932686c, acl: host-acl, subnet: "{{ student_name }}-net2-inside", public_ip: false, key_name: "{{ workshop_name }}", tags: {Owner: student, group: hostsvi } }
+              - { name: "{{ student_name }}-rtr2", size: t2.medium, image: ami-541e3931, acl: rtr-acl, subnet: "{{ student_name }}-net2-outside", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: student, network_os: ios, group: routers}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
+      with_sequence: count="{{ num_students }}"
       loop_control:
-        loop_var: vpc_item
+        loop_var: student_number
       tags:
-        - cloud
-
-    - include_role:
-        name: cloud-security-groups
-      vars:
-        - cloud_vpc_name: "{{ vpc_item }}"
-        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
-        - cloud_security_group_data: "{{ acl_dict }}"
-      with_items: "{{ vpcs.keys() | default([]) }}"
-      loop_control:
-        loop_var: vpc_item
-      tags:
-        - security_groups
-
-    - include_role:
-        name: cloud-instances
-      vars:
-        - cloud_vpc_name: "{{ vpc_item }}"
-        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
-        - cloud_instance_data: "{{ vpcs[vpc_item].instances }}"
-      with_items: "{{ vpcs.keys() | default([]) }}"
-      loop_control:
-        loop_var: vpc_item
-      tags:
-        - cloud-instances
-
-    - include_role:
-        name: cloud-vnfs
-      vars:
-        - cloud_vpc_name: "{{ vpc_item }}"
-        - cloud_vpc_data: "{{ vpcs[vpc_item] }}"
-        - cloud_network_data: "{{ vpcs[vpc_item].networks }}"
-      with_items: "{{ vpcs.keys() | default([]) }}"
-      loop_control:
-        loop_var: vpc_item
-      tags:
-        - cloud-vnfs
+        - inventory-files
+        - security-groups

@@ -13,3 +13,15 @@
 [submodule "roles/cloud-keypairs"]
 	path = roles/cloud-keypairs
 	url = git@github.com:ismc/ansible-role-cloud-keypairs.git
+[submodule "roles/cloud-dns"]
+	path = roles/cloud-dns
+	url = git@github.com:ismc/ansible-role-cloud-dns.git
+[submodule "ansible-role-cloud-route"]
+	path = ansible-role-cloud-route
+	url = git@github.com:ismc/ansible-role-cloud-route.git
+[submodule "roles/cloud-route"]
+	path = roles/cloud-route
+	url = git@github.com:ismc/ansible-role-cloud-route.git
+[submodule "roles/cloud-routes"]
+	path = roles/cloud-routes
+	url = git@github.com:ismc/ansible-role-cloud-routes.git
