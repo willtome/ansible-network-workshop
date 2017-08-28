@@ -1,0 +1,128 @@
+---
+- include_role:
+    name: cloud-networks
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_network_data: "{{ vpc_item.networks }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-networks
+
+- include_role:
+    name: cloud-keypairs
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_keypair_data: "{{ ssh_keys }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-keypairs
+
+- include_role:
+    name: cloud-security-groups
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_security_group_data: "{{ acl_dict }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-security-groups
+
+- include_role:
+    name: cloud-instances
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_instance_data: "{{ vpc_item.instances }}"
+    - cloud_dns_provider: route53
+    - cloud_dns_zone: "{{ workshop_dns_zone }}"
+    - cloud_dns_domain: "{{ vpc_item.project }}.{{ workshop_dns_zone }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-instances
+
+- include_role:
+    name: cloud-routes
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_route_data: "{{ vpc_item.routes }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  when: vpc_item.routes is defined
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-routes
+
+- include_role:
+    name: cloud-vnfs
+  vars:
+    - cloud_vpc_name: "{{ vpc_item.name }}"
+    - cloud_vpc_data: "{{ vpc_item }}"
+    - cloud_network_data: "{{ vpc_item.networks }}"
+  with_items: "{{ vpc_list | default([]) }}"
+  loop_control:
+    loop_var: vpc_item
+  tags:
+    - cloud-vnfs
+
+- name: Create the workshop inventory file groups
+  lineinfile:
+    path: "./{{ workshop_name }}.hosts"
+    line: "[{{ instance_item.1.tags.group }}]"
+    create: yes
+  with_subelements:
+    - "{{ vpc_list }}"
+    - instances
+  loop_control:
+    loop_var: instance_item
+  tags:
+    - inventory-files
+
+- name: Create the workshop inventory file
+  lineinfile:
+    path: "./{{ workshop_name }}.hosts"
+    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
+    insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
+  with_subelements:
+    - "{{ vpc_list }}"
+    - instances
+  loop_control:
+    loop_var: instance_item
+  tags:
+    - inventory-files
+
+- name: Create student inventory files groups
+  lineinfile:
+    path: "./{{ student_name }}.{{ workshop_name }}.hosts"
+    line: "[{{ instance_item.1.tags.group }}]"
+    create: yes
+  with_subelements:
+    - "{{ vpc_list }}"
+    - instances
+  loop_control:
+    loop_var: instance_item
+  tags:
+    - inventory-files
+
+- name: Create student inventory files
+  lineinfile:
+    path: "./{{ student_name }}.{{ workshop_name }}.hosts"
+    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
+    insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
+  with_subelements:
+    - "{{ vpc_list }}"
+    - instances
+  loop_control:
+    loop_var: instance_item
+  tags:
+    - inventory-files
