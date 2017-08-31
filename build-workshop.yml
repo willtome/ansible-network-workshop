@@ -19,11 +19,9 @@
         acl_dict:
           host-acl:
             - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
-            - { src_ip: 0.0.0.0/0, dst_ports: -1, proto: icmp }
+            - { src_ip: 0.0.0.0/0, proto: icmp }
           rtr-acl:
-            - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
-            - { src_ip: 0.0.0.0/0, dst_ports: -1, proto: icmp }
-#            - { src_ip: 0.0.0.0/0, proto: all }
+            - { src_ip: 0.0.0.0/0, proto: all }
         ssh_keys: "{ '{{ workshop_name }}': '{{ lookup('file', './{{ workshop_name }}_key.pub') }}' }"
         vpc_list:
           - name: "{{ workshop_name }}-vpc1"
