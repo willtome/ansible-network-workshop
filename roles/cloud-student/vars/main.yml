@@ -1,0 +1,4 @@
+---
+# vars file for cloud-student
+control_node_inventory_path: /home/{{ ansible_ssh_user }}/networking-workshop/lab_inventory
+workshop: net-ws

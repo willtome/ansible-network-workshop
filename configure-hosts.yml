@@ -1,6 +1,6 @@
 ---
-- hosts: control, routers
-  gather_facts: yes
+- hosts: control
+  become: yes
 
-  tasks:
-    - debug: msg="{{ inventory_hostname }} uptime {{ ansible_uptime_seconds }} seconds"
+  roles:
+    - cloud-student

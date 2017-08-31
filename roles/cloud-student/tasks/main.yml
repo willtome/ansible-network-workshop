@@ -1,0 +1,91 @@
+---
+#tasks file for cloud-student
+- name: Install EPEL
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    state: present
+  tags:
+    - control
+
+- name: Install base packages
+  yum:
+    name:
+      - vim
+      - git
+      - python-pip
+    state: latest
+    enablerepo: epel-testing
+  tags:
+    - control
+
+- name: Install Ansible
+  pip:
+    name:
+      - git+https://github.com/ansible/ansible.git@devel
+    state: latest
+
+
+- name: Clone networking repo
+  git:
+    accept_hostkey: yes
+    clone: yes
+    dest: ~{{ansible_ssh_user}}/networking-workshop
+    repo: https://github.com/gdykeman/networking-workshop.git
+    force: yes
+  become_user: "{{ansible_ssh_user}}"
+  ignore_errors: yes
+  tags:
+    - control
+
+- name: Create lab inventory directory
+  file:
+    state: directory
+    path: /home/{{ ansible_ssh_user }}/networking-workshop/lab_inventory
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+  tags:
+    - control
+
+- name: Install ansible.cfg and vimrc in home directory
+  template:
+    src: "{{ item }}"
+    dest: ~{{ ansible_ssh_user }}/.{{ (item | splitext)[0] }}
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+  with_items:
+    - ansible.cfg.j2
+    - vimrc.j2
+
+- name: Put student inventory in proper spot
+  copy:
+    src: ./{{ student_name }}.net-ws.hosts
+    dest: "{{ control_node_inventory_path }}"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+  # when: student_name in inventory_hostname
+  tags:
+    - control
+
+- name: Put ssh-key in proper spot
+  copy:
+    src: ./{{ workshop }}_key
+    dest: "/home/{{ansible_ssh_user}}/.ssh/"
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+
+- name: change permissions on ssh-key file
+  file:
+    path: "/home/{{ansible_ssh_user}}/.ssh/{{workshop}}_key"
+    mode: 0700
+
+- name: copy over ssh config file
+  copy:
+    src: sshconfig
+    dest: /home/{{ansible_ssh_user}}/.ssh/config
+    owner: "{{ansible_ssh_user}}"
+    group: "{{ansible_ssh_user}}"
+
+- name: change permissions on ssh config file
+  file:
+    path: "/home/{{ansible_ssh_user}}/.ssh/config"
+    mode: 0700
