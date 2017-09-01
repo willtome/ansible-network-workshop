@@ -1,0 +1,22 @@
+---
+- hosts: routers
+  connection: local
+  gather_facts: no
+  vars:
+    backup_root: ./backup
+
+  tasks:
+    - set_fact:
+        backup_file: "{{ backup_root }}/{{ inventory_hostname }}"
+
+    - name: Stat the config file
+      stat:
+        path: "{{ backup_file }}"
+      register: stat_result
+
+    - name: check the running-config against master config
+      ios_config:
+        diff_against: intended
+        intended_config: "{{ lookup('file', backup_file) }}"
+      when: stat_result.stat.exists == True
+      register: diff_results
