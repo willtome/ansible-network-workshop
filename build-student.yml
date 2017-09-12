@@ -1,4 +1,8 @@
 ---
+- name: Include the template file
+  include_vars:
+    file: "{{ workshop_template }}"
+
 - include_role:
     name: cloud-networks
   vars:
@@ -81,7 +85,7 @@
     line: "[{{ instance_item.1.tags.group }}]"
     create: yes
   with_subelements:
-    - "{{ vpc_list }}"
+    - "{{ vpc_list | default([]) }}"
     - instances
   loop_control:
     loop_var: instance_item
@@ -94,7 +98,7 @@
     line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
     insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
   with_subelements:
-    - "{{ vpc_list }}"
+    - "{{ vpc_list | default([]) }}"
     - instances
   loop_control:
     loop_var: instance_item
@@ -107,7 +111,7 @@
     line: "[{{ instance_item.1.tags.group }}]"
     create: yes
   with_subelements:
-    - "{{ vpc_list }}"
+    - "{{ vpc_list | default([]) }}"
     - instances
   loop_control:
     loop_var: instance_item
@@ -120,7 +124,7 @@
     line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
     insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
   with_subelements:
-    - "{{ vpc_list }}"
+    - "{{ vpc_list | default([]) }}"
     - instances
   loop_control:
     loop_var: instance_item

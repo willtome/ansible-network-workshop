@@ -1,35 +1,4 @@
-ansible-workshop
-=========
-
-This is a set of playbooks used for provisioning workshops in clouds.  It takes a template and creates the architecture specified for each student.
-
-Requirements
-------------
-
-These playbooks require that you have your cloud environment setup correctly for authentication.  They also require the cloud roles linked in as sub modules.
-
-
-Example
--------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-```
-ansible-playbook -e @smc-workshop-vars.yml build-workshop.yml
-```
-
-Example vars file
------------------
-```yaml
-workshop_name: 'smc-workshop'
-workshop_template: 'network-automation-template1.yml'
-workshop_dns_zone: 'naps-redhat.com'
-num_students: 1
-```
-
-Example template
-----------------
-```yaml
+---
 ansible_ssh_private_key_file: "./{{ workshop_name }}_key"
 cloud_user: ec2-user
 student_name: "student{{ student_number }}"
@@ -72,9 +41,3 @@ vpc_list:
     instances:
       - { name: "{{ student_name }}-host1", size: micro, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net2-inside", public_ip: false, key_name: "{{ workshop_name }}", tags: {Owner: student, group: hosts } }
       - { name: "{{ student_name }}-rtr2", size: medium, image: csr-byol, acl: rtr-acl, subnet: "{{ student_name }}-net2-outside", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: student, network_os: ios, group: routers}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
-```
-
-License
--------
-
-GPL-3

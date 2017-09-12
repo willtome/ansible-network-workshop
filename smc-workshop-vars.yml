@@ -1,0 +1,5 @@
+---
+workshop_name: 'smc-workshop'
+workshop_template: 'network-automation-template1.yml'
+workshop_dns_zone: 'naps-redhat.com'
+num_students: 1
