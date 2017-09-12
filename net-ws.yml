@@ -1,0 +1,6 @@
+---
+ansible_python_interpreter: python
+workshop_name: "net-ws"
+workshop_template: 'network-automation-template1.yml'
+workshop_dns_zone: "redhatgov.io"
+num_students: 1

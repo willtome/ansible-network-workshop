@@ -17,13 +17,12 @@
     enablerepo: epel-testing
   tags:
     - control
-
 - name: Install Ansible
-  pip:
-    name:
-      - git+https://github.com/ansible/ansible.git@devel
-    state: latest
-
+  yum:
+    name: "http://releases.ansible.com/ansible/rpm/preview/epel-7-x86_64/ansible-2.4.0.0-0.2.rc2.el7.ans.noarch.rpm"
+    state: present
+  tags:
+    - control
 
 - name: Clone networking repo
   git:
