@@ -95,7 +95,7 @@
 - name: Create the workshop inventory file
   lineinfile:
     path: "./{{ workshop_name }}.hosts"
-    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
+    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }} ansible_host={{ cloud_instance_dict[instance_item.1.name].ip }} ansible_ssh_user={{ cloud_user }} student_name={{ student_name }} private_ip={{ cloud_instance_dict[instance_item.1.name].private_ip }}"
     insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
   with_subelements:
     - "{{ vpc_list | default([]) }}"
@@ -121,7 +121,7 @@
 - name: Create student inventory files
   lineinfile:
     path: "./{{ student_name }}.{{ workshop_name }}.hosts"
-    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }}  ansible_ssh_user={{ cloud_user }} student_name={{ student_name }}"
+    line: "{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }} ansible_host={{ cloud_instance_dict[instance_item.1.name].ip }} ansible_ssh_user={{ cloud_user }} student_name={{ student_name }} private_ip={{ cloud_instance_dict[instance_item.1.name].private_ip }}"
     insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
   with_subelements:
     - "{{ vpc_list | default([]) }}"
