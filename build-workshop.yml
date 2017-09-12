@@ -13,5 +13,3 @@
       with_sequence: count="{{ num_students }}"
       loop_control:
         loop_var: student_number
-
-    - debug: var=cloud_instance_dict
