@@ -1,4 +1,4 @@
-ansible-workshop
+ansible-networking-workshop
 =========
 
 This is a set of playbooks used for provisioning workshops in clouds.  It takes a template and creates the architecture specified for each student.
@@ -24,7 +24,7 @@ Example vars file
 workshop_name: 'smc-workshop'
 workshop_template: 'network-automation-template1.yml'
 workshop_dns_zone: 'naps-redhat.com'
-num_students: 1
+num_students: 6
 ```
 
 Example template
