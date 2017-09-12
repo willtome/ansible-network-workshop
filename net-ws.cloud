@@ -1,7 +1,0 @@
-[cloud]
-localhost
-
-[cloud:vars]
-workshop_name="net-ws"
-workshop_dns_zone="naps-redhat.com"
-num_students=1
