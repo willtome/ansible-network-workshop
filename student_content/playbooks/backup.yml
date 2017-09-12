@@ -1,0 +1,16 @@
+---
+- name: backup router configurations
+  hosts: routers
+  gather_facts: no
+
+  tasks:
+    - name: Backup configuration
+      ios_config:
+        backup: yes
+      register: config
+
+    - name: Create link to most recent config
+      file:
+        src: "{{ config.backup_path }}"
+        dest: "./backup/{{ inventory_hostname }}"
+        state: link
