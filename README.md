@@ -1,4 +1,4 @@
-ansible-networking-workshop
+ansible-network-workshop
 =========
 
 This is a set of playbooks used for provisioning workshops in clouds.  It takes a template and creates the architecture specified for each student.
