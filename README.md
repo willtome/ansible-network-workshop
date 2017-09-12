@@ -74,6 +74,10 @@ vpc_list:
       - { name: "{{ student_name }}-rtr2", size: medium, image: csr-byol, acl: rtr-acl, subnet: "{{ student_name }}-net2-outside", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: student, network_os: ios, group: routers}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
 ```
 
+This template yeilds the following architecture:
+
+![Image of workshop](https://github.com/ismc/ansible-networking-workshop/blob/master/images/network-automation-template1.png)
+
 License
 -------
 
