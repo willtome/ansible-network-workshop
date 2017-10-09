@@ -17,12 +17,17 @@
     enablerepo: epel-testing
   tags:
     - control
+
 - name: Install Ansible
   yum:
-    name: "http://releases.ansible.com/ansible/rpm/preview/epel-7-x86_64/ansible-2.4.0.0-0.2.rc2.el7.ans.noarch.rpm"
-    state: present
+    name:
+      - sshpass
+      - ansible
+    state: latest
+    enablerepo: rhui-REGION-rhel-server-extras
   tags:
     - control
+
 
 - name: Clone networking repo
   git:
