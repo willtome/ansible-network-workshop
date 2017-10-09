@@ -1,7 +1,0 @@
-[control]
-student5-control.net-ws.redhatgov.io ansible_host=52.14.223.226 ansible_ssh_user=ec2-user student_name=student5 private_ip=172.17.9.107
-[routers]
-student5-rtr2.net-ws.redhatgov.io ansible_host=18.221.200.173 ansible_ssh_user=ec2-user student_name=student5 private_ip=172.18.9.114
-student5-rtr1.net-ws.redhatgov.io ansible_host=13.59.228.203 ansible_ssh_user=ec2-user student_name=student5 private_ip=172.17.9.20
-[hosts]
-student5-host1.net-ws.redhatgov.io ansible_host=172.18.10.196 ansible_ssh_user=ec2-user student_name=student5 private_ip=172.18.10.196
