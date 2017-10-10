@@ -129,5 +129,5 @@
 
 - name: change permissions on ssh config file
   file:
-    path: "/home/{{student_name}}/.ssh/config"
+    path: "/home/{{student_name`}}/.ssh/config"
     mode: 0700
