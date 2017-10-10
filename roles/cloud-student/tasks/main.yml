@@ -1,4 +1,44 @@
 ---
+###Configure Password Auth
+
+- name: Create User Group
+  group:
+    name: "{{ student_name }}"
+    state: present
+
+- name: Create User Account
+  user:
+    createhome: yes
+    group: "{{ student_name }}"
+    name: "{{ student_name }}"
+    shell: /bin/bash
+    state: present
+    password: "{{ admin_password_hash }}"
+
+- name: Include Red Hat tasks
+  include: "{{ ansible_os_family }}.yml"
+  static: no
+  when: ansible_os_family == 'RedHat'
+
+- name: Configure sshd and sudoers
+  lineinfile:
+    dest: "{{ item.dest }}"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state | default('present') }}"
+    validate: "{{ item.validate | default(omit) }}"
+    backup: no
+  with_items: "{{ common_node_config_options }}"
+  notify: restart ssh
+  tags:
+    - ssh
+    - sudo
+    - common
+
+- meta: flush_handlers
+  tags:
+    - common
+
 #tasks file for cloud-student
 - name: Install EPEL
   yum:
@@ -12,7 +52,6 @@
     name:
       - vim
       - git
-      - python-pip
     state: latest
     enablerepo: epel-testing
   tags:
@@ -28,15 +67,14 @@
   tags:
     - control
 
-
 - name: Clone networking repo
   git:
     accept_hostkey: yes
     clone: yes
-    dest: ~{{ansible_ssh_user}}/networking-workshop
+    dest: ~{{student_name}}/networking-workshop
     repo: https://github.com/gdykeman/networking-workshop.git
     force: yes
-  become_user: "{{ansible_ssh_user}}"
+  become_user: "{{student_name}}"
   ignore_errors: yes
   tags:
     - control
@@ -44,18 +82,18 @@
 - name: Create lab inventory directory
   file:
     state: directory
-    path: /home/{{ ansible_ssh_user }}/networking-workshop/lab_inventory
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    path: /home/{{ student_name }}/networking-workshop/lab_inventory
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
   tags:
     - control
 
 - name: Install ansible.cfg and vimrc in home directory
   template:
     src: "{{ item }}"
-    dest: ~{{ ansible_ssh_user }}/.{{ (item | splitext)[0] }}
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    dest: ~{{ student_name }}/.{{ (item | splitext)[0] }}
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
   with_items:
     - ansible.cfg.j2
     - vimrc.j2
@@ -64,8 +102,8 @@
   copy:
     src: ./{{ student_name }}.net-ws.hosts
     dest: "{{ control_node_inventory_path }}"
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
   # when: student_name in inventory_hostname
   tags:
     - control
@@ -73,23 +111,23 @@
 - name: Put ssh-key in proper spot
   copy:
     src: ./{{ workshop }}_key
-    dest: "/home/{{ansible_ssh_user}}/.ssh/"
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    dest: "/home/{{student_name}}/.ssh/"
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
 
 - name: change permissions on ssh-key file
   file:
-    path: "/home/{{ansible_ssh_user}}/.ssh/{{workshop}}_key"
+    path: "/home/{{student_name}}/.ssh/{{workshop}}_key"
     mode: 0700
 
 - name: copy over ssh config file
   copy:
     src: sshconfig
-    dest: /home/{{ansible_ssh_user}}/.ssh/config
-    owner: "{{ansible_ssh_user}}"
-    group: "{{ansible_ssh_user}}"
+    dest: /home/{{student_name}}/.ssh/config
+    owner: "{{student_name}}"
+    group: "{{student_name}}"
 
 - name: change permissions on ssh config file
   file:
-    path: "/home/{{ansible_ssh_user}}/.ssh/config"
+    path: "/home/{{student_name}}/.ssh/config"
     mode: 0700
