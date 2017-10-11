@@ -106,7 +106,7 @@
     group: "{{ student_name }}"
   # when: student_name in inventory_hostname
   tags:
-    - control
+    - testing
 
 - name: Put ssh-key in proper spot
   copy:
@@ -114,11 +114,15 @@
     dest: "/home/{{student_name}}/.ssh/"
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
+  tags:
+    - testing
 
 - name: change permissions on ssh-key file
   file:
     path: "/home/{{student_name}}/.ssh/{{workshop}}_key"
     mode: 0700
+  tags:
+    - testing
 
 - name: copy over ssh config file
   copy:
@@ -126,8 +130,12 @@
     dest: /home/{{student_name}}/.ssh/config
     owner: "{{student_name}}"
     group: "{{student_name}}"
+  tags:
+    - testing
 
 - name: change permissions on ssh config file
   file:
-    path: "/home/{{student_name`}}/.ssh/config"
+    path: "/home/{{student_name}}/.ssh/config"
     mode: 0700
+  tags:
+    - testing
