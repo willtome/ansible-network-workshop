@@ -1,4 +1,4 @@
-ansible-network-workshop
+Ansible Network Workshop
 =========
 
 This is a set of playbooks used for provisioning workshops in clouds.  It takes a template and creates the architecture specified for each student.
@@ -15,13 +15,19 @@ Example
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
 ```
-ansible-playbook -e @smc-workshop-vars.yml build-workshop.yml
+ansible-playbook -e @net-ws.yml build-workshop.yml
 ```
+
+To configure the control node (install Ansible, setup Ansible Inventory, etc) 
+```
+ansible-playbook configure-hosts.yml -i student1.net-ws.hosts
+```
+where `net-ws` is your workshop_name.  The -i sets up the inventory.
 
 Example vars file
 -----------------
 ```yaml
-workshop_name: 'smc-workshop'
+workshop_name: 'net-ws'
 workshop_template: 'network-automation-template1.yml'
 workshop_dns_zone: 'naps-redhat.com'
 num_students: 6
