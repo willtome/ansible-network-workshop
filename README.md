@@ -22,7 +22,7 @@ To configure the control node (install Ansible, setup Ansible Inventory, etc)
 ```
 ansible-playbook configure-hosts.yml -i student1.net-ws.hosts
 ```
-where `net-ws` is your workshop_name.  The -i sets up the inventory.
+where `net-ws` is your workshop_name.  The -i specifies the inventory.
 
 Example vars file
 -----------------
