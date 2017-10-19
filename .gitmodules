@@ -1,18 +1,18 @@
 [submodule "roles/cloud-instances"]
 	path = roles/cloud-instances
-	url = git@github.com:ismc/ansible-role-cloud-instances.git
+	url = https://github.com/ismc/ansible-role-cloud-instances.git
 [submodule "roles/cloud-networks"]
 	path = roles/cloud-networks
-	url = git@github.com:ismc/ansible-role-cloud-networks.git
+	url = https://github.com/ismc/ansible-role-cloud-networks.git
 [submodule "roles/cloud-keypairs"]
 	path = roles/cloud-keypairs
-	url = git@github.com:ismc/ansible-role-cloud-keypairs.git
+	url = https://github.com/ismc/ansible-role-cloud-keypairs.git
 [submodule "roles/cloud-routes"]
 	path = roles/cloud-routes
-	url = git@github.com:ismc/ansible-role-cloud-routes.git
+	url = https://github.com/ismc/ansible-role-cloud-routes.git
 [submodule "roles/cloud-vnfs"]
 	path = roles/cloud-vnfs
-	url = git@github.com:ismc/ansible-role-cloud-vnfs.git
+	url = https://github.com/ismc/ansible-role-cloud-vnfs.git
 [submodule "roles/cloud-security-groups"]
 	path = roles/cloud-security-groups
-	url = git@github.com:ismc/ansible-role-cloud-security-groups.git
+	url = https://github.com/ismc/ansible-role-cloud-security-groups.git
