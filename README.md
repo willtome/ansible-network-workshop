@@ -18,9 +18,9 @@ Including an example of how to use your role (for instance, with variables passe
 ansible-playbook -e @net-ws.yml build-workshop.yml
 ```
 
-To configure the control node (install Ansible, setup Ansible Inventory, etc) 
+To configure the control node (install Ansible, setup Ansible Inventory, etc)
 ```
-ansible-playbook configure-hosts.yml -i student1.net-ws.hosts
+ansible-playbook configure-hosts.yml -i net-ws.hosts
 ```
 where `net-ws` is your workshop_name.  The -i specifies the inventory.
 

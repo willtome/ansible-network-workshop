@@ -74,17 +74,47 @@
   tags:
     - control
 
-- name: Clone networking repo
+- name: Clone lightbulb repo
   git:
     accept_hostkey: yes
     clone: yes
-    dest: ~{{student_name}}/networking-workshop
-    repo: https://github.com/gdykeman/networking-workshop.git
+    dest: /tmp/lightbulb
+    repo: https://github.com/network-automation/lightbulb.git
     force: yes
-  become_user: "{{student_name}}"
-  ignore_errors: yes
   tags:
-    - control
+    - lightbulb
+
+- name: Move networking workshop folder to correct location
+  command: cp -r /tmp/lightbulb/workshops/networking/ /home/{{student_name}}/networking-workshop
+  tags:
+    - lightbulb
+
+#- name: Clone networking repo
+#  local_action:
+#    module:  git
+#    accept_hostkey: yes
+#    clone: yes
+#    dest: /tmp/lightbulb
+#    repo: https://github.com/network-automation/lightbulb.git
+#    force: yes
+#  ignore_errors: yes
+#  become: no
+#  run_once: True
+#  tags:
+#    - control
+#    - lightbulb
+
+# not fast b/c of https://github.com/ansible/ansible/issues/21513
+#- name: Grab Networking Workshop (directory) from Git repo
+#  copy:
+#    src: /tmp/lightbulb/workshops/networking/
+#    dest: /home/{{student_name}}/networking-workshop
+#    force: yes
+#  become_user: "{{student_name}}"
+#  ignore_errors: yes
+#  tags:
+#    - control
+#    - lightbulb
 
 - name: Create lab inventory directory
   file:
