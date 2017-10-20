@@ -52,6 +52,7 @@
     name:
       - vim
       - git
+      - python-pip
     state: latest
     enablerepo: epel-testing
   tags:
