@@ -3,5 +3,8 @@ ansible_python_interpreter: python
 workshop_name: "net-ws"
 workshop_template: 'network-automation-template1.yml'
 workshop_dns_zone: "redhatgov.io"
+workshop_provider1: "aws"
+workshop_region1: "us-east-2"
+workshop_provider2: "aws"
+workshop_region2: "us-east-2"
 num_students: 1
-
