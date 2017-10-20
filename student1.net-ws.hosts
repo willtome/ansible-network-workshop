@@ -1,0 +1,7 @@
+[control]
+control ansible_host=13.59.32.224 ansible_ssh_user=ec2-user student_name=student1 private_ip=172.17.1.171 workshop_name=net-ws
+[routers]
+rtr2 ansible_host=52.15.58.36 ansible_ssh_user=ec2-user student_name=student1 private_ip=172.18.1.229 workshop_name=net-ws
+rtr1 ansible_host=18.220.227.23 ansible_ssh_user=ec2-user student_name=student1 private_ip=172.17.1.23 workshop_name=net-ws
+[hosts]
+host1 ansible_host=172.18.2.39 ansible_ssh_user=ec2-user student_name=student1 private_ip=172.18.2.39 workshop_name=net-ws
