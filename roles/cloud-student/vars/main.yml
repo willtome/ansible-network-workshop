@@ -2,5 +2,5 @@
 # vars file for cloud-student
 control_node_inventory_path: '/home/{{ student_name }}/networking-workshop/lab_inventory'
 workshop: "{{workshop_name}}"
-admin_password: ansible
+admin_password: "{{ password | default('ansible') }}"
 admin_password_hash: "{{ admin_password | password_hash(salt='sRvXWmR5BBwqRlih') }}"
