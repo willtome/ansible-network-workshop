@@ -1,6 +1,12 @@
 ---
 ###Configure Password Auth
 
+- name: Double Check
+  debug:
+    msg:
+      - "student_name: {{ student_name }}"
+      - "password {{ admin_password_hash }}"
+
 - name: Create User Group
   group:
     name: "{{ student_name }}"
@@ -100,7 +106,7 @@
 
 - name: Put student inventory in proper spot
   copy:
-    src: ./{{ student_name }}.net-ws.hosts
+    src: ./{{ student_name }}.{{workshop_name}}.hosts
     dest: "{{ control_node_inventory_path }}"
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
@@ -110,7 +116,7 @@
 
 - name: Put ssh-key in proper spot
   copy:
-    src: ./{{ workshop }}_key
+    src: ./{{workshop_name}}_key
     dest: "/home/{{student_name}}/.ssh/"
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
@@ -119,7 +125,7 @@
 
 - name: change permissions on ssh-key file
   file:
-    path: "/home/{{student_name}}/.ssh/{{workshop}}_key"
+    path: "/home/{{student_name}}/.ssh/{{workshop_name}}_key"
     mode: 0700
   tags:
     - testing

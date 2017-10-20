@@ -1,2 +1,3 @@
 Host *
-     IdentityFile /home/ec2-user/.ssh/net-ws_key
+     User ec2-user
+     IdentityFile /home/ec2-user/.ssh/{{workshop_name}}_key
