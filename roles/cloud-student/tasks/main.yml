@@ -80,11 +80,23 @@
     dest: /tmp/lightbulb
     repo: https://github.com/network-automation/lightbulb.git
     force: yes
+  remote_user: "{{ student_name }}"
   tags:
     - lightbulb
 
+- name: Create networking-workshop  directory
+  file:
+    state: directory
+    path: /home/{{ student_name }}/networking-workshop
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
+  remote_user: "{{ student_name }}"
+  tags:
+    - control
+
 - name: Move networking workshop folder to correct location
-  command: cp -r /tmp/lightbulb/workshops/networking/ /home/{{student_name}}/networking-workshop
+  command: cp -r /tmp/lightbulb/workshops/networking/ /home/{{student_name}}/networking-workshop/backup
+  remote_user: "{{ student_name }}"
   tags:
     - lightbulb
 

@@ -27,10 +27,15 @@ where `net-ws` is your workshop_name.  The -i specifies the inventory.
 Example vars file
 -----------------
 ```yaml
-workshop_name: 'net-ws'
+ansible_python_interpreter: python
+workshop_name: "net-ws"
 workshop_template: 'network-automation-template1.yml'
-workshop_dns_zone: 'naps-redhat.com'
-num_students: 6
+workshop_dns_zone: "rhdemo.io"
+workshop_provider1: "aws"
+workshop_region1: "us-east-2"
+workshop_provider2: "aws"
+workshop_region2: "us-east-2"
+num_students: 1
 ```
 
 Example template
