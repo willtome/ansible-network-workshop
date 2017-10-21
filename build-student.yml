@@ -130,3 +130,21 @@
     loop_var: instance_item
   tags:
     - inventory-files
+
+- name: Create student etc hosts file (local host entries)
+  blockinfile:
+    path: "./{{ student_name }}.{{ workshop_name }}.etchosts"
+    create: yes
+    block: |
+      127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+      localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+- name: Create student etc hosts file
+  lineinfile:
+    path: "./{{ student_name }}.{{ workshop_name }}.etchosts"
+    line: "{{ cloud_instance_dict[instance_item.1.name].ip }} {{ instance_item.1.name.split('-')[1] }}"
+  with_subelements:
+    - "{{ vpc_list | default([]) }}"
+    - instances
+  loop_control:
+    loop_var: instance_item

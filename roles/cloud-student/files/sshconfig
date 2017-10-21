@@ -1,3 +1,0 @@
-Host *
-     User ec2-user
-     IdentityFile /home/ec2-user/.ssh/{{workshop_name}}_key

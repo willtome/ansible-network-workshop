@@ -161,8 +161,8 @@
     - testing
 
 - name: copy over ssh config file
-  copy:
-    src: sshconfig
+  template:
+    src: sshconfig.j2
     dest: /home/{{student_name}}/.ssh/config
     owner: "{{student_name}}"
     group: "{{student_name}}"
