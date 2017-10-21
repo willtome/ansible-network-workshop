@@ -1,11 +1,9 @@
 ---
-###Configure Password Auth
-
 - name: Double Check
   debug:
     msg:
       - "student_name: {{ student_name }}"
-      - "password {{ admin_password_hash }}"
+      - "password {{ admin_password }}"
 
 - name: Create User Group
   group:
@@ -22,8 +20,7 @@
     password: "{{ admin_password_hash }}"
 
 - name: Include Red Hat tasks
-  include: "{{ ansible_os_family }}.yml"
-  static: no
+  include_tasks: "{{ ansible_os_family }}.yml"
   when: ansible_os_family == 'RedHat'
 
 - name: Configure sshd and sudoers
@@ -80,7 +77,6 @@
     dest: /tmp/lightbulb
     repo: https://github.com/network-automation/lightbulb.git
     force: yes
-  remote_user: "{{ student_name }}"
   tags:
     - lightbulb
 
@@ -99,7 +95,7 @@
   remote_user: "{{ student_name }}"
   tags:
     - lightbulb
-
+         
 #- name: Clone networking repo
 #  local_action:
 #    module:  git
@@ -152,9 +148,17 @@
     dest: "{{ control_node_inventory_path }}"
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
-  # when: student_name in inventory_hostname
   tags:
     - testing
+
+- name: setup /etc/hosts file per student
+  copy:
+    src: ./{{ student_name }}.{{workshop_name}}.etchosts
+    dest: "/etc/hosts"
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
+  tags:
+    - etchosts
 
 - name: Put ssh-key in proper spot
   copy:
@@ -173,8 +177,8 @@
     - testing
 
 - name: copy over ssh config file
-  copy:
-    src: sshconfig
+  template:
+    src: sshconfig.j2
     dest: /home/{{student_name}}/.ssh/config
     owner: "{{student_name}}"
     group: "{{student_name}}"
