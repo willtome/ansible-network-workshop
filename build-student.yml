@@ -105,6 +105,20 @@
   tags:
     - inventory-files
 
+- name: Create human readable control host list
+  lineinfile:
+    path: "./{{ workshop_name }}.PUBLIC.LIST"
+    line: "{{ student_name }}: {{ cloud_user }}@{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }} Public IP Address={{ cloud_instance_dict[instance_item.1.name].ip }}"
+    create: yes
+  when: '"control" in instance_item.1.name'
+  with_subelements:
+    - "{{ vpc_list | default([]) }}"
+    - instances
+  loop_control:
+    loop_var: instance_item
+  tags:
+    - inventory-files
+
 - name: Create student inventory files groups
   lineinfile:
     path: "./{{ student_name }}.{{ workshop_name }}.hosts"
