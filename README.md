@@ -24,6 +24,11 @@ ansible-playbook configure-hosts.yml -i net-ws.hosts
 ```
 where `net-ws` is your workshop_name.  The -i specifies the inventory.
 
+To validate a workshop, run the approrieate playbook (e.g. `validate-workshop1.yml`):
+```
+ansible-playbook -i smc-ws.hosts -e @smc-ws.yml --private-key=smc-ws_key -u ec2-user validate-workshop1.yml
+```
+
 Example vars file
 -----------------
 ```yaml
