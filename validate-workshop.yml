@@ -1,0 +1,52 @@
+---
+- hosts: routers
+  connection: local
+  gather_facts: no
+
+  tasks:
+
+    - set_fact:
+        rtr1_hostname: "{{ student_name }}-rtr1.{{ workshop_name }}.{{ workshop_dns_zone }}"
+        rtr2_hostname: "{{ student_name }}-rtr2.{{ workshop_name }}.{{ workshop_dns_zone }}"
+
+    - block:
+      - set_fact:
+          control_hostname: "{{ student_name }}-control.{{ workshop_name }}.{{ workshop_dns_zone }}"
+
+      - set_fact:
+          rtr2_ip: "{{ hostvars[ rtr2_hostname ].ansible_host }}"
+          control_ip: "{{ hostvars[ control_hostname ].ansible_host }}"
+
+      - name: Test reachability from rtr1 to control node
+        net_ping:
+          dest: "{{ control_ip }}"
+
+      - name: Test reachability from rtr1 to rtr2
+        net_ping:
+          dest: "{{ rtr2_ip }}"
+
+      when: inventory_hostname == rtr1_hostname
+
+    - block:
+      - set_fact:
+          control_hostname: "{{ student_name }}-control.{{ workshop_name }}.{{ workshop_dns_zone }}"
+          host1_hostname: "{{ student_name }}-host1.{{ workshop_name }}.{{ workshop_dns_zone }}"
+
+      - set_fact:
+          rtr1_ip: "{{ hostvars[ rtr1_hostname ].ansible_host }}"
+          control_ip: "{{ hostvars[ control_hostname ].ansible_host }}"
+          host1_ip: "{{ hostvars[ host1_hostname ].ansible_host }}"
+
+      - name: Test reachability from rtr2 to control node
+        net_ping:
+          dest: "{{ control_ip }}"
+
+      - name: Test reachability from rtr2 to rtr1
+        net_ping:
+          dest: "{{ rtr1_ip }}"
+
+      - name: Test reachability from rtr2 to host1
+        net_ping:
+          dest: "{{ host1_ip }}"
+
+      when: inventory_hostname == rtr2_hostname
