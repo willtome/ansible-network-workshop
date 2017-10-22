@@ -9,6 +9,9 @@
         rtr1_hostname: "{{ student_name }}-rtr1.{{ workshop_name }}.{{ workshop_dns_zone }}"
         rtr2_hostname: "{{ student_name }}-rtr2.{{ workshop_name }}.{{ workshop_dns_zone }}"
 
+    - name: Waiting for RTR to finish booting
+      local_action: wait_for port=22 host="{{ inventory_hostname }}" timeout=600 delay=0
+
     - block:
       - set_fact:
           control_hostname: "{{ student_name }}-control.{{ workshop_name }}.{{ workshop_dns_zone }}"
