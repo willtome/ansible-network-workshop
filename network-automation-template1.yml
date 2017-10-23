@@ -7,6 +7,7 @@ outside_octet: "{{ inside_octet | int - 1 }}"
 acl_dict:
   host-acl:
     - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
+    - { src_ip: 0.0.0.0/0, dst_ports: 443, proto: tcp }
     - { src_ip: 0.0.0.0/0, proto: icmp }
   rtr-acl:
     - { src_ip: 0.0.0.0/0, proto: all }
