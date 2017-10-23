@@ -6,8 +6,12 @@ This is a set of playbooks used for provisioning workshops in clouds.  It takes 
 Requirements
 ------------
 
-These playbooks require that you have your cloud environment setup correctly for authentication.  They also require the cloud roles linked in as sub modules.
+These playbooks require that you have your cloud environment setup correctly for authentication.  They also require the cloud roles linked in as sub modules.  In
+order to pull down all of the required submodules, run:
 
+```
+git clone https://github.com/network-automation/ansible-network-workshop.git --recursive
+```
 
 Example
 -------
