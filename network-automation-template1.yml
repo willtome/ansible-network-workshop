@@ -1,9 +1,12 @@
 ---
 ansible_ssh_private_key_file: "./{{ workshop_name }}_key"
 cloud_user: ec2-user
-student_name: "student{{ student_number }}"
-inside_octet: "{{ student_number | int * 2 }}"
+offset: "{{ offset_number | default(0) | int}}"
+student_name: "student{{ student_number | int + offset | int}}"
+octet: "{{ student_number | int + offset | int }}"
+inside_octet: "{{ octet | int * 2 }}"
 outside_octet: "{{ inside_octet | int - 1 }}"
+
 acl_dict:
   host-acl:
     - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
