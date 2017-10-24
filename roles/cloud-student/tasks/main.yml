@@ -1,4 +1,6 @@
 ---
+###Configure Password Auth
+
 - name: Double Check
   debug:
     msg:
@@ -80,22 +82,17 @@
   tags:
     - lightbulb
 
-- name: Create networking-workshop  directory
+- name: Move networking workshop folder to correct location
+  command: cp -r /tmp/lightbulb/workshops/networking/ /home/{{student_name}}/networking-workshop
+  tags:
+    - lightbulb
+
+- name: fix permissions of networking-workshop
   file:
-    state: directory
     path: /home/{{ student_name }}/networking-workshop
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
-  remote_user: "{{ student_name }}"
-  tags:
-    - control
-
-- name: Move networking workshop folder to correct location
-  command: cp -r /tmp/lightbulb/workshops/networking/ /home/{{student_name}}/networking-workshop/backup
-  remote_user: "{{ student_name }}"
-  tags:
-    - lightbulb
-         
+    recurse: yes
 #- name: Clone networking repo
 #  local_action:
 #    module:  git
@@ -132,15 +129,19 @@
   tags:
     - control
 
-- name: Install ansible.cfg and vimrc in home directory
+- name: Override /etc/ansible/hosts
   template:
-    src: "{{ item }}"
-    dest: ~{{ student_name }}/.{{ (item | splitext)[0] }}
+    src: ansible.cfg.j2
+    dest: /etc/ansible/ansible.cfg
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
-  with_items:
-    - ansible.cfg.j2
-    - vimrc.j2
+
+- name: Install ansible.cfg and vimrc in home directory
+  template:
+    src: vimrc.j2
+    dest: ~{{ student_name }}/.vimrc
+    owner: "{{ student_name }}"
+    group: "{{ student_name }}"
 
 - name: Put student inventory in proper spot
   copy:
@@ -148,8 +149,6 @@
     dest: "{{ control_node_inventory_path }}"
     owner: "{{ student_name }}"
     group: "{{ student_name }}"
-  tags:
-    - testing
 
 - name: setup /etc/hosts file per student
   copy:
@@ -172,7 +171,7 @@
 - name: change permissions on ssh-key file
   file:
     path: "/home/{{student_name}}/.ssh/{{workshop_name}}_key"
-    mode: 0700
+    mode: 0400
   tags:
     - testing
 
