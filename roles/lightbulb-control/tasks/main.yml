@@ -1,0 +1,119 @@
+- name: Install EPEL
+  yum:
+    name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+    state: present
+  register: install_epel
+  until: install_epel|success
+  delay: 3
+  retries: 5
+  tags:
+    - control_node
+    - control
+
+- name: Install base packages
+  yum:
+    name:
+      - vim
+      - git
+      - python-pip
+      - sshpass
+    state: latest
+    enablerepo: epel-testing
+  register: install_base_packages
+  until: install_base_packages|success
+  delay: 3
+  retries: 5
+  tags:
+    - control_node
+    - control
+
+- name: Install Ansible
+  pip:
+    name:
+      - ansible
+    state: latest
+  register: install_ansible
+  until: install_ansible|success
+  delay: 3
+  retries: 5
+  tags:
+    - control_node
+    - control
+  when: control_node_install_ansible
+
+
+- name: Clone lightbulb
+  git:
+    accept_hostkey: yes
+    clone: yes
+    dest: ~{{ username }}/lightbulb
+    repo: https://github.com/network-automation/lightbulb.git
+    force: yes
+  register: clone_lightbulb
+  until: clone_lightbulb|success
+  delay: 3
+  retries: 5
+  become_user: "{{ username }}"
+  tags:
+    - control_node
+    - control
+
+#- name: Remove things that students don't need
+#  file:
+#    state: absent
+#    path: ~{{ username }}/lightbulb/{{ item }}
+#  with_items:
+#    - aws_lab_setup
+#    - resources
+#    - Vagrantfile
+#    - README.md
+#  tags:
+#    - control_node
+#    - control
+
+- name: Install ansible.cfg and vimrc in home directory
+  template:
+    src: "{{ item }}"
+    dest: ~{{ username }}/.{{ (item | splitext)[0] }}
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  with_items:
+    - ansible.cfg.j2
+    - vimrc.j2
+    - sshconfig.j2
+  tags:
+    - control_node
+    - control
+    - vim
+
+- name: Create lab inventory directory
+  file:
+    state: directory
+    path: /home/{{ username }}/lightbulb/lessons/lab_inventory
+  tags:
+    - control_node
+    - control
+
+- name: Put student inventory in proper spot
+  copy:
+    src: ./{{ username }}-instances.txt
+    dest: "{{ control_node_inventory_path }}"
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  when: username in inventory_hostname
+  tags:
+    - control_node
+    - control
+
+- name: Put hosts file in proper spot
+  copy:
+    src: ./{{username}}-hosts.txt
+    dest: /etc/hosts
+
+- name: Put ssh-key in proper spot
+  copy:
+    src: "./{{workshop_name}}_key"
+    dest: "~{{ username }}/.ssh/id_rsa"
+    owner: "{{ username }}"
+    group: "{{ username}}"
+    mode: 0400

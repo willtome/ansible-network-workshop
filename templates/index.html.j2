@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<font face="verdana,sans,arial">
+<style>
+
+/* unvisited link */
+a:link {
+    color: #FF6978;
+}
+
+/* visited link */
+a:visited {
+    color: #FF6978;
+}
+
+/* mouse over link */
+a:hover {
+    color: #3DCCCC;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+}
+Try it Yourself »
+
+</style>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+</head>
+<body>
+
+<div data-role="page" id="pageone">
+  <div data-role="header">
+    <h1>Ansible Linklight Workshop</h1>
+  </div>
+  <div data-role="main">
+    <h3>CONTACT: instructor_email <br>
+
+
+GITHUB for Ansible Linklight: <a href="workshop_github" target="lightbulb">workshop_github</a><br><br>
+
+</h3>
+
+<h3><b><font color="gray">URLs for lab materials: </font></b></h3>
+
+
+<h4><a href="workshop_slides" target="new_1">DECK: Ansible Essentials</a><br></h4>
+{#<h4><a href="http://workshop.cosmocomet.com/decks/intro-to-ansible-tower.html" target="new_2">DECK:  Intro To Tower</a><br></h4> #}
+<h4><a href="workshop_labguide" target="new_main">LAB GUIDE</a><br><br></h4>
+
+<hr>
+
+
+<h3><a href="http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz" target="new_main">Tower Download Link</a></h3>
+You may want to run these commands on your control node to download Ansible Tower directly with wget:
+<pre><h3>
+sudo yum -y install wget
+wget http://releases.ansible.com/ansible-tower/setup/ansible-tower-setup-latest.tar.gz
+</h3></pre>
+
+
+<!-- <h3><a href="https://www.ansible.com/license" target="new_2">
+Request Licensing page (Pick the second option: non-Enterprise version for immediate download):</a><br><br></h3>-->
+
+
+<h3><a href="http://workshop.cosmocomet.com/ansible_tower_license.txt" target="new_gd_license">4-Node NFR Lightbulb license is available here</a><br><br></h3>
+
+<hr>
+  </div>
+{% for item in users %}
+  <div data-role="main" class="ui-content">
+    <div data-role="collapsible">
+      <h1>{{item.username}} - Click to see details!</h1>
+      <p>[all:vars]<br />
+ansible_user={{item.username}}<br />
+ansible_ssh_pass=ansible<br />
+{% if ssh_port is defined %}<br />
+ansible_port={{ ssh_port }}<br />
+{% endif %}
+<br />
+[control]<br />
+{% for vm in ec2_instances.instances %}
+{% if item.username == vm.tags.Owner and 'control' == vm.tags.group %}
+{{ vm.tags.Role }} ansible_host={{ vm.public_ip_address }}<br />
+{% endif %}
+{% endfor %}
+<br />
+[routers]<br />
+{% for vm in ec2_instances.instances %}
+{% if item.username == vm.tags.Owner and 'routers' == vm.tags.group %}
+{{ vm.tags.Role }} ansible_host={{ vm.public_ip_address }}<br />
+{% endif %}
+{% endfor %}
+<br />
+[hosts]<br />
+{% for vm in ec2_instances.instances %}
+{% if item.username == vm.tags.Owner and 'hosts' == vm.tags.group %}
+{{ vm.tags.Role }} ansible_host={{ vm.private_ip_address }}<br />
+{% endif %}
+{% endfor %}</p>
+    </div>
+  </div>
+{% endfor %}
+  <div data-role="footer">
+    <h1>Thanks for participating!</h1>
+  </div>
+</div>
+
+</body>
+</html>

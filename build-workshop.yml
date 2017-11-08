@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: provision cloud infrastrcuture
+  hosts: localhost
   connection: local
   gather_facts: no
 
@@ -9,7 +10,99 @@
       args:
         creates: "./{{ workshop_name }}_key"
 
+    - name: generate users list
+      set_fact:
+        users: "{{ users|default([]) + [ {'name': 'student' + item, 'username': 'student' + item, 'email': 'student' + item + '@example.com'} ] }}"
+      with_sequence: start="{{ student_count_start }}" end="{{ student_count_end }}"
+      when: student_count_start is defined and student_count_end is defined
+
     - include_tasks: build-student.yml
-      with_sequence: count="{{ num_students }}"
+      with_sequence: start="{{ student_count_start }}" end="{{ student_count_end }}"
       loop_control:
         loop_var: student_number
+      tags:
+        - aws
+
+    - name: get instances
+      ec2_remote_facts:
+        region: "{{ workshop_region1 }}"
+        filters:
+          "tag:Environment": "{{workshop_name}}"
+          "instance-state-name": "running"
+      register: ec2_instances
+
+    - name: add instances to inventory
+      add_host:
+        name: "{{item.tags.Name}}"
+        ansible_host: "{{item.public_ip_address}}"
+        ansible_user: ec2-user
+        ansible_ssh_private_key_file: "./{{workshop_name}}_key"
+        groups: "managed_nodes,{{item.tags.group}}"
+        student_name: "{{item.tags.Owner}}"
+        workshop_name: "{{item.tags.Environment}}"
+        ssh_port: 22
+      when: item.public_ip_address != None
+      with_items:
+        - "{{ ec2_instances.instances }}"
+
+
+    - name: create student webpage
+      template:
+        src: ./templates/index.html.j2
+        dest: ./index.html
+
+- name: Debug Inventories
+  hosts: control
+  become: no
+  gather_facts: no
+
+  tasks:
+  - ping:
+
+- name: Configure common options on managed nodes and control nodes
+  hosts: "managed_nodes:control:!routers"
+  become: yes
+  pre_tasks:
+  - set_fact:
+      username: "{{student_name}}"
+  roles:
+    - lightbulb-accounts
+    - lightbulb-common
+
+- name: Configure control node
+  hosts: control
+  become: yes
+  roles:
+    - lightbulb-control
+
+- name: Configure hosting
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+  - name: create s3 bucket
+    s3_bucket:
+      name: "{{workshop_name}}.{{workshop_dns_zone}}"
+  - name: enable web hosting
+    s3_website:
+     name: "{{workshop_name}}.{{workshop_dns_zone}}"
+     state: present
+     region: "{{workshop_region1}}"
+    register: s3_site
+  - name: DNS for student webpage
+    route53:
+      state: present
+      zone: "{{workshop_dns_zone}}"
+      record: "{{workshop_name}}.{{workshop_dns_zone}}"
+      type: CNAME
+      value: "lightbulb-{{workshop_name}}.s3-website-us-east-1.amazonaws.com"
+  - name: PUT student webpage
+    s3_sync:
+      bucket: "{{workshop_name}}.{{workshop_dns_zone}}"
+      region: "{{workshop_region1}}"
+      file_root: ./
+      mime_map:
+        .html: text/html
+      permission: public-read
+      include: "index.html"

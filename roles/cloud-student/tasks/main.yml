@@ -76,7 +76,7 @@
   git:
     accept_hostkey: yes
     clone: yes
-    dest: /tmp/lightbulb
+    dest: ~{{ username }}/lightbulb
     repo: https://github.com/network-automation/lightbulb.git
     force: yes
   tags:

@@ -1,0 +1,12 @@
+---
+ansible_python_interpreter: python
+workshop_name: "linklight"
+workshop_template: 'linklight-template.yml'
+workshop_dns_zone: "rhdemo.io"
+workshop_provider1: "aws"
+workshop_region1: "us-east-1"
+workshop_provider2: "aws"
+workshop_region2: "us-east-1"
+student_count_start: 1
+student_count_end: 2
+admin_password: ansible
