@@ -27,7 +27,7 @@ vpc_list:
     networks:
       - { name: "{{ student_name }}-net1", cidr: "172.17.{{ outside_octet }}.0/24", az: "{{ workshop_region1 }}a" }
     instances:
-      - { name: "{{ student_name }}-control", size: medium, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", volume_size: 20, tags: {Owner: "{{student_name}}", group: control} }
+      - { name: "{{ student_name }}-tower", size: medium, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", volume_size: 20, tags: {Owner: "{{student_name}}", group: control} }
       - { name: "{{ student_name }}-rtr1", size: medium, image: csr-byol, acl: rtr-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: "{{student_name}}", network_os: ios, group: routers}, user_data: 'ios-config-0001=ip route 0.0.0.0 0.0.0.0 GigabitEthernet1 dhcp' }
     routes:
       - { subnet: "{{ student_name }}-net1", cidr: "172.18.{{ inside_octet }}.0/24", instance: "{{ student_name }}-rtr1" }
