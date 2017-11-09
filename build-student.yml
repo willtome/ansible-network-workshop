@@ -107,7 +107,7 @@
 
 - name: Create human readable control host list
   lineinfile:
-    path: "./{{ workshop_name }}.PUBLIC.LIST"
+    path: "./{{ workshop_name }}-public.txt"
     line: "{{ student_name }}: {{ cloud_user }}@{{ instance_item.1.name }}.{{ workshop_name }}.{{ workshop_dns_zone }} Public IP Address={{ cloud_instance_dict[instance_item.1.name].ip }}"
     create: yes
   when: '"control" in instance_item.1.name'

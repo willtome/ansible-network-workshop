@@ -1,3 +1,6 @@
 *.hosts
 *.etchosts
+*.txt
+*.html
+*_key*
 .DS_Store

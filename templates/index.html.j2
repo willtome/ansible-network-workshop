@@ -82,26 +82,19 @@ ansible_ssh_pass=ansible<br />
 ansible_port={{ ssh_port }}<br />
 {% endif %}
 <br />
-[control]<br />
+{% set exculded_groups = ('all', 'ungrouped', 'managed_nodes', 'public', 'private') %}
+{% for group in groups %}
+{% if group not in ('all', 'ungrouped', 'managed_nodes', 'public', 'private') %}
+[{{group}}]<br />
 {% for vm in ec2_instances.instances %}
-{% if item.username == vm.tags.Owner and 'control' == vm.tags.group %}
-{{ vm.tags.Role }} ansible_host={{ vm.public_ip_address }}<br />
+{% if item.username == vm.tags.Owner and group == vm.tags.group %}
+{{ vm.tags.Role }} ansible_host={{ hostvars[vm.tags.Name]['ansible_host'] }}<br />
 {% endif %}
 {% endfor %}
 <br />
-[routers]<br />
-{% for vm in ec2_instances.instances %}
-{% if item.username == vm.tags.Owner and 'routers' == vm.tags.group %}
-{{ vm.tags.Role }} ansible_host={{ vm.public_ip_address }}<br />
 {% endif %}
 {% endfor %}
-<br />
-[hosts]<br />
-{% for vm in ec2_instances.instances %}
-{% if item.username == vm.tags.Owner and 'hosts' == vm.tags.group %}
-{{ vm.tags.Role }} ansible_host={{ vm.private_ip_address }}<br />
-{% endif %}
-{% endfor %}</p>
+</p>
     </div>
   </div>
 {% endfor %}

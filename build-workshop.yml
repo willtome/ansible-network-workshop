@@ -31,7 +31,7 @@
           "instance-state-name": "running"
       register: ec2_instances
 
-    - name: add instances to inventory
+    - name: add public instances to inventory
       add_host:
         name: "{{item.tags.Name}}"
         ansible_host: "{{item.public_ip_address}}"
@@ -42,6 +42,20 @@
         workshop_name: "{{item.tags.Environment}}"
         ssh_port: 22
       when: item.public_ip_address != None
+      with_items:
+        - "{{ ec2_instances.instances }}"
+
+    - name: add private instances to inventory
+      add_host:
+        name: "{{item.tags.Name}}"
+        ansible_host: "{{item.private_ip_address}}"
+        ansible_user: ec2-user
+        ansible_ssh_private_key_file: "./{{workshop_name}}_key"
+        groups: "managed_nodes,private,{{item.tags.group}}"
+        student_name: "{{item.tags.Owner}}"
+        workshop_name: "{{item.tags.Environment}}"
+        ssh_port: 22
+      when: item.public_ip_address == None
       with_items:
         - "{{ ec2_instances.instances }}"
 
