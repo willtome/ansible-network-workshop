@@ -1,0 +1,30 @@
+---
+ansible_ssh_private_key_file: "./{{ workshop_name }}_key"
+cloud_user: ec2-user
+offset: "{{ offset_number | default(0) | int}}"
+student_name: "student{{ student_number | int + offset | int}}"
+octet: "{{ student_number | int + offset | int }}"
+inside_octet: "{{ octet | int * 2 }}"
+outside_octet: "{{ inside_octet | int - 1 }}"
+
+acl_dict:
+  host-acl:
+    - { src_ip: 0.0.0.0/0, dst_ports: 22, proto: tcp }
+    - { src_ip: 0.0.0.0/0, dst_ports: 443, proto: tcp }
+    - { src_ip: 0.0.0.0/0, dst_ports: 80, proto: tcp }
+    - { src_ip: 0.0.0.0/0, proto: icmp }
+ssh_keys: "{ '{{ workshop_name }}': '{{ lookup('file', './{{ workshop_name }}_key.pub') }}' }"
+vpc_list:
+  - name: "{{ workshop_name }}-vpc1"
+    provider: "{{ workshop_provider1 }}"
+    region: "{{ workshop_region1 }}"
+    project: "{{ workshop_name }}"
+    cidr: 172.17.0.0/16
+    acl_list:
+      - host-acl
+    networks:
+      - { name: "{{ student_name }}-net1", cidr: "172.17.{{ outside_octet }}.0/24", az: "{{ workshop_region1 }}a" }
+    instances:
+      - { name: "{{ student_name }}-tower", size: medium, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", volume_size: 20, tags: {Owner: "{{student_name}}", group: control} }
+      - { name: "{{ student_name }}-web1", size: micro, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: "{{student_name}}", group: web} }
+      - { name: "{{ student_name }}-web2", size: micro, image: rhel7, acl: host-acl, subnet: "{{ student_name }}-net1", public_ip: true, key_name: "{{ workshop_name }}", tags: {Owner: "{{student_name}}", group: web} }

@@ -63,7 +63,7 @@
     - name: create student webpage
       template:
         src: ./templates/index.html.j2
-        dest: ./index.html
+        dest: "./{{ workshop_name }}-index.html"
 
 - name: Debug Inventories
   hosts: control
@@ -103,6 +103,7 @@
      name: "{{workshop_name}}.{{workshop_dns_zone}}"
      state: present
      region: "{{workshop_region1}}"
+     suffix: "{{ workshop_name }}-index.html"
     register: s3_site
   - name: DNS for student webpage
     route53:
@@ -110,7 +111,7 @@
       zone: "{{workshop_dns_zone}}"
       record: "{{workshop_name}}.{{workshop_dns_zone}}"
       type: CNAME
-      value: "lightbulb-{{workshop_name}}.s3-website-us-east-1.amazonaws.com"
+      value: "{{workshop_name}}.{{workshop_dns_zone}}.s3-website-us-east-1.amazonaws.com"
   - name: PUT student webpage
     s3_sync:
       bucket: "{{workshop_name}}.{{workshop_dns_zone}}"
@@ -119,4 +120,4 @@
       mime_map:
         .html: text/html
       permission: public-read
-      include: "index.html"
+      include: "{{ workshop_name }}-index.html"

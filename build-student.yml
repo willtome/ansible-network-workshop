@@ -121,7 +121,7 @@
 
 - name: Create student inventory files groups
   lineinfile:
-    path: "./{{ student_name }}-instances.txt"
+    path: "./{{ workshop_name }}-{{ student_name }}-instances.txt"
     line: "[{{ instance_item.1.tags.group }}]"
     create: yes
   with_subelements:
@@ -134,7 +134,7 @@
 
 - name: Create student inventory files
   lineinfile:
-    path: "./{{ student_name }}-instances.txt"
+    path: "./{{ workshop_name }}-{{ student_name }}-instances.txt"
     line: "{{ instance_item.1.name.split('-')[1] }} ansible_host={{ cloud_instance_dict[instance_item.1.name].ip }} private_ip={{ cloud_instance_dict[instance_item.1.name].private_ip }} ansible_ssh_user={{ cloud_user }} ansible_network_os={{ instance_item.1.tags.network_os | default ('none')}}"
     insertafter: "\\[{{ instance_item.1.tags.group }}\\]"
   with_subelements:
@@ -147,7 +147,7 @@
 
 - name: Create student etc hosts file (local host entries)
   blockinfile:
-    path: "./{{ student_name }}-hosts.txt"
+    path: "./{{ workshop_name }}-{{ student_name }}-hosts.txt"
     create: yes
     block: |
       127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
@@ -155,7 +155,7 @@
 
 - name: Create student etc hosts file
   lineinfile:
-    path: "./{{ student_name }}-hosts.txt"
+    path: "./{{ workshop_name }}-{{ student_name }}-hosts.txt"
     line: "{{ cloud_instance_dict[instance_item.1.name].ip }} {{ instance_item.1.name.split('-')[1] }}"
   with_subelements:
     - "{{ vpc_list | default([]) }}"

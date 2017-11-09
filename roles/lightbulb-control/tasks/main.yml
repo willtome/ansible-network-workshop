@@ -96,7 +96,7 @@
 
 - name: Put student inventory in proper spot
   copy:
-    src: ./{{ username }}-instances.txt
+    src: ./{{ workshop_name }}-{{ username }}-instances.txt
     dest: "{{ control_node_inventory_path }}"
     owner: "{{ username }}"
     group: "{{ username }}"
@@ -107,8 +107,13 @@
 
 - name: Put hosts file in proper spot
   copy:
-    src: ./{{username}}-hosts.txt
+    src: ./{{ workshop_name }}-{{username}}-hosts.txt
     dest: /etc/hosts
+
+- name: create ssh directory
+  file:
+    state: directory
+    path: "~{{ username }}/.ssh"
 
 - name: Put ssh-key in proper spot
   copy:
