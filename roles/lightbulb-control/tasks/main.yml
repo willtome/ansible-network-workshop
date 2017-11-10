@@ -92,6 +92,7 @@
     path: /home/{{ username }}/lightbulb/lessons/lab_inventory
     owner: "{{ username }}"
     group: "{{ username }}"
+    recurse: yes
   tags:
     - control_node
     - control
