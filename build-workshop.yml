@@ -74,7 +74,7 @@
   - ping:
 
 - name: Configure common options on managed nodes and control nodes
-  hosts: "managed_nodes:control:!routers"
+  hosts: "managed_nodes:control:!routers:!private"
   become: yes
   pre_tasks:
   - set_fact:
