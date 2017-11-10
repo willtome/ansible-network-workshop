@@ -90,6 +90,8 @@
   file:
     state: directory
     path: /home/{{ username }}/lightbulb/lessons/lab_inventory
+    owner: "{{ username }}"
+    group: "{{ username }}"
   tags:
     - control_node
     - control
@@ -109,11 +111,15 @@
   copy:
     src: ./{{ workshop_name }}-{{username}}-hosts.txt
     dest: /etc/hosts
+    owner: "{{ username }}"
+    group: "{{ username }}"
 
 - name: create ssh directory
   file:
     state: directory
     path: "~{{ username }}/.ssh"
+    owner: "{{ username }}"
+    group: "{{ username }}"
 
 - name: Put ssh-key in proper spot
   copy:
